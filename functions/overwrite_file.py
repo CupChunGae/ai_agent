@@ -7,9 +7,10 @@ def overwrite_file(working_directory, file_path, content):
         return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
     if os.path.isdir(target_file_path):
         return f'Error: Cannot write to "{file_path}" as it is a directory'
+    os.makedirs(file_path, exist_ok=True)
     try:
         with open(target_file_path, "w") as f:
             f.write(content)
-        return f'Successfully overwrote file "{file_path}"'
+        return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
     except Exception as e:
         return f'Error: Failed to write to file "{file_path}": {e}'
