@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 
 def overwrite_file(working_directory, file_path, content):
     working_directory_path = os.path.abspath(working_directory)
@@ -14,3 +15,17 @@ def overwrite_file(working_directory, file_path, content):
         return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
     except Exception as e:
         return f'Error: Failed to write to file "{file_path}": {e}'
+    
+schema_overwrite_file = types.FunctionDeclaration(
+    name="overwrite_file",
+    description="Allows access to the specified file and overwrite the contents with the content argument in the function.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+            ),
+        },
+    ),
+)

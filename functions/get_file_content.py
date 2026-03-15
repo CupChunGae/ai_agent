@@ -1,5 +1,6 @@
 import os
 from config import reading_limit
+from google.genai import types
 
 def get_file_content(working_directory, file_path):
     working_directory_path = os.path.abspath(working_directory)
@@ -17,3 +18,18 @@ def get_file_content(working_directory, file_path):
             return content
     except Exception as e:
         return f'Error: Failed to read file "{file_path}": {e}'
+
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Accesses a specified file from a directory relative to the working directory, providing the file contents as a string.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+            ),
+        },
+    ),
+)
