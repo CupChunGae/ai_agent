@@ -4,7 +4,7 @@ from google import genai
 from dotenv import load_dotenv
 from google.genai import types
 from prompts import system_prompt
-from functions.call_functions import available_functions
+from functions.call_functions import available_functions, call_function
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -35,9 +35,24 @@ def main():
         
     print(response.text)
     
-    if response.function_calls != None:
+    function_results = []
+    
+    if response.function_calls is not None:
         for item in response.function_calls:
-            print(f"Calling function: {item.name}({item.args})")
+            function_call_result = call_function(item, args.verbose)
+            if not function_call_result.parts:
+                raise Exception (".parts list is empty.")
+            
+            if function_call_result.parts[0].function_response is None:
+                raise Exception ("Missing FunctionResponse Object")
+            
+            if function_call_result.parts[0].function_response.response is None:
+                raise Exception ("function_response.response is missing.")
+            
+            function_results.append(function_call_result.parts[0])
+            
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
 
 
 if __name__ == "__main__":

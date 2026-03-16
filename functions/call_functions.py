@@ -2,7 +2,7 @@ from google.genai import types
 from functions.get_files_info import *
 from functions.get_file_content import *
 from functions.run_python_file import *
-from functions.overwrite_file import *
+from functions.write_file import *
 
 available_functions = types.Tool(
     function_declarations=[
@@ -12,6 +12,13 @@ available_functions = types.Tool(
         schema_overwrite_file
         ],
 )
+
+function_map = {
+    "get_file_content": get_file_content,
+    "get_files_info": get_files_info,
+    "run_python_file": run_python_file,
+    "write_file": write_file
+}
 
 def call_function(function_call, verbose = False):
     if verbose == True:
@@ -32,10 +39,17 @@ def call_function(function_call, verbose = False):
         )
     
     args = dict(function_call.args) if function_call.args else {}
+    args["working_directory"] = "./calculator"
+    
+    function_result = function_map[function_name](**args)
+    
+    return types.Content(
+        role="tool",
+        parts=[
+            types.Part.from_function_response(
+                name=function_name,
+                response={"result": function_result},
+            )
+        ],
+    )
         
-function_map = {
-    "get_file_content": get_file_content,
-    "get_file_info": get_files_info,
-    "run_python_file": run_python_file,
-    "overwrite_file": overwrite_file
-}
